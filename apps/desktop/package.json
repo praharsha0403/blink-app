@@ -3,7 +3,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "pnpm -w cap-setup && dotenv -e ../../.env -- pnpm run preparescript && dotenv -e ../../.env -- pnpm tauri dev",
-		"build:tauri": "export BINDGEN_EXTRA_CLANG_ARGS='-I/opt/homebrew/opt/ffmpeg@6/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include' && export PKG_CONFIG_PATH='/opt/homebrew/lib/pkgconfig:/opt/homebrew/opt/ffmpeg@6/lib/pkgconfig' && export LIBCLANG_PATH='/opt/homebrew/opt/llvm/lib' && export CFLAGS='-I/opt/homebrew/opt/ffmpeg@6/include' && export LDFLAGS='-L/opt/homebrew/opt/ffmpeg@6/lib' && dotenv -e ../../.env -- pnpm run preparescript && dotenv -e ../../.env -- pnpm tauri build",
+		"build:tauri": "dotenv -e ../../.env -- pnpm run preparescript && dotenv -e ../../.env -- pnpm tauri build",
 		"preparescript": "node scripts/prepare.js",
 		"localdev": "dotenv -e ../../.env -- vinxi dev --port 3002",
 		"build": "vinxi build",
