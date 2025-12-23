@@ -1,0 +1,4 @@
+[env]
+BINDGEN_EXTRA_CLANG_ARGS = "-I/Users/chaitanyasai/homebrew/opt/ffmpeg/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
+PKG_CONFIG_PATH = "/Users/chaitanyasai/homebrew/lib/pkgconfig:/Users/chaitanyasai/homebrew/opt/ffmpeg/lib/pkgconfig"
+LIBCLANG_PATH = "/Users/chaitanyasai/homebrew/opt/llvm/lib"
