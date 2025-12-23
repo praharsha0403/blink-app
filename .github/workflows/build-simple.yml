@@ -94,6 +94,8 @@ jobs:
           echo "CXXFLAGS=-I$ffmpegDir\include" >> $env:GITHUB_ENV  
           echo "LDFLAGS=-L$ffmpegDir\lib" >> $env:GITHUB_ENV
           echo "BINDGEN_EXTRA_CLANG_ARGS=-I$ffmpegDir\include" >> $env:GITHUB_ENV
+          echo "LIB=$ffmpegDir\lib;$env:LIB" >> $env:GITHUB_ENV
+          echo "LIBCLANG_PATH=C:\Program Files\LLVM\bin" >> $env:GITHUB_ENV
       
       - name: Create env file
         shell: bash
