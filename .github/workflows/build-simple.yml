@@ -70,26 +70,30 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
       
-      - name: Setup FFmpeg
-        uses: FedericoCarboni/setup-ffmpeg@v3
-        with:
-          ffmpeg-version: '6.1'
-          architecture: 'x64'
-          linking-type: 'shared'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Setup FFmpeg environment
+      - name: Download FFmpeg dev build
         shell: powershell
         run: |
-          $ffmpegPath = (Get-Command ffmpeg).Source | Split-Path -Parent
-          echo "FFMPEG_DIR=$ffmpegPath" >> $env:GITHUB_ENV
-          echo "PKG_CONFIG_PATH=$ffmpegPath\..\lib\pkgconfig" >> $env:GITHUB_ENV
-          echo "PATH=$ffmpegPath;$env:PATH" >> $env:GITHUB_ENV
+          Write-Host "Downloading FFmpeg full dev build..."
+          Invoke-WebRequest -Uri "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full-shared.7z" -OutFile "ffmpeg.7z"
+          Write-Host "Extracting FFmpeg..."
+          7z x ffmpeg.7z -o"C:\ffmpeg-dev"
+          $ffmpegDir = Get-ChildItem "C:\ffmpeg-dev" -Directory | Select-Object -First 1
+          Write-Host "FFmpeg extracted to: $($ffmpegDir.FullName)"
+          echo "FFMPEG_DIR=$($ffmpegDir.FullName)" >> $env:GITHUB_ENV
+          echo "PKG_CONFIG_PATH=$($ffmpegDir.FullName)\lib\pkgconfig" >> $env:GITHUB_ENV
+          echo "$($ffmpegDir.FullName)\bin" >> $env:GITHUB_PATH
       
-      - name: Install LLVM and pkg-config
+      - name: Install LLVM
+        run: choco install llvm -y
+      
+      - name: Setup build environment
+        shell: powershell
         run: |
-          choco install llvm pkgconfiglite -y
-          echo "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          $ffmpegDir = $env:FFMPEG_DIR
+          echo "CFLAGS=-I$ffmpegDir\include" >> $env:GITHUB_ENV
+          echo "CXXFLAGS=-I$ffmpegDir\include" >> $env:GITHUB_ENV  
+          echo "LDFLAGS=-L$ffmpegDir\lib" >> $env:GITHUB_ENV
+          echo "BINDGEN_EXTRA_CLANG_ARGS=-I$ffmpegDir\include" >> $env:GITHUB_ENV
       
       - name: Create env file
         shell: bash
@@ -105,7 +109,6 @@ jobs:
         env:
           TAURI_PRIVATE_KEY: ""
           TAURI_KEY_PASSWORD: ""
-          LIBCLANG_PATH: "C:\\Program Files\\LLVM\\bin"
       
       - name: Upload EXE
         uses: actions/upload-artifact@v4
