@@ -1,4 +1,4 @@
-name: Build Blink Simple
+name: Build Blink
 
 on:
   push:
@@ -59,6 +59,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-ffmpeg
+            mingw-w64-x86_64-pkgconf
+            mingw-w64-x86_64-clang
+      
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -69,33 +79,15 @@ jobs:
       
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          target: x86_64-pc-windows-gnu
       
-      - name: Download FFmpeg dev build
-        shell: powershell
+      - name: Setup environment
+        shell: msys2 {0}
         run: |
-          Write-Host "Downloading FFmpeg full dev build..."
-          Invoke-WebRequest -Uri "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full-shared.7z" -OutFile "ffmpeg.7z"
-          Write-Host "Extracting FFmpeg..."
-          7z x ffmpeg.7z -o"C:\ffmpeg-dev"
-          $ffmpegDir = Get-ChildItem "C:\ffmpeg-dev" -Directory | Select-Object -First 1
-          Write-Host "FFmpeg extracted to: $($ffmpegDir.FullName)"
-          echo "FFMPEG_DIR=$($ffmpegDir.FullName)" >> $env:GITHUB_ENV
-          echo "PKG_CONFIG_PATH=$($ffmpegDir.FullName)\lib\pkgconfig" >> $env:GITHUB_ENV
-          echo "$($ffmpegDir.FullName)\bin" >> $env:GITHUB_PATH
-      
-      - name: Install LLVM
-        run: choco install llvm -y
-      
-      - name: Setup build environment
-        shell: powershell
-        run: |
-          $ffmpegDir = $env:FFMPEG_DIR
-          echo "CFLAGS=-I$ffmpegDir\include" >> $env:GITHUB_ENV
-          echo "CXXFLAGS=-I$ffmpegDir\include" >> $env:GITHUB_ENV  
-          echo "LDFLAGS=-L$ffmpegDir\lib" >> $env:GITHUB_ENV
-          echo "BINDGEN_EXTRA_CLANG_ARGS=-I$ffmpegDir\include" >> $env:GITHUB_ENV
-          echo "LIB=$ffmpegDir\lib;$env:LIB" >> $env:GITHUB_ENV
-          echo "LIBCLANG_PATH=C:\Program Files\LLVM\bin" >> $env:GITHUB_ENV
+          echo "PKG_CONFIG_PATH=/mingw64/lib/pkgconfig" >> $GITHUB_ENV
+          echo "LIBCLANG_PATH=/mingw64/bin" >> $GITHUB_ENV
+          echo "/mingw64/bin" >> $GITHUB_PATH
       
       - name: Create env file
         shell: bash
@@ -107,7 +99,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
       
       - name: Build app
-        run: cd apps/desktop && pnpm build:tauri
+        run: cd apps/desktop && pnpm build:tauri -- --target x86_64-pc-windows-gnu
         env:
           TAURI_PRIVATE_KEY: ""
           TAURI_KEY_PASSWORD: ""
@@ -117,5 +109,5 @@ jobs:
         with:
           name: blink-windows-exe
           path: |
-            apps/desktop/src-tauri/target/release/bundle/nsis/*.exe
-            apps/desktop/src-tauri/target/release/bundle/msi/*.msi
+            apps/desktop/src-tauri/target/x86_64-pc-windows-gnu/release/bundle/nsis/*.exe
+            apps/desktop/src-tauri/target/x86_64-pc-windows-gnu/release/bundle/msi/*.msi
