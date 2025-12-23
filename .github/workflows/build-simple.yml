@@ -87,6 +87,7 @@ jobs:
         run: |
           echo "PKG_CONFIG_PATH=/mingw64/lib/pkgconfig" >> $GITHUB_ENV
           echo "LIBCLANG_PATH=/mingw64/bin" >> $GITHUB_ENV
+          echo "BINDGEN_EXTRA_CLANG_ARGS=-I$(pwd)/.build-support/include" >> $GITHUB_ENV
           echo "/mingw64/bin" >> $GITHUB_PATH
       
       - name: Create env file
