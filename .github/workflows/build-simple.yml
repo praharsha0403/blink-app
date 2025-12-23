@@ -78,6 +78,14 @@ jobs:
           linking-type: 'shared'
           github-token: ${{ secrets.GITHUB_TOKEN }}
       
+      - name: Setup FFmpeg environment
+        shell: powershell
+        run: |
+          $ffmpegPath = (Get-Command ffmpeg).Source | Split-Path -Parent
+          echo "FFMPEG_DIR=$ffmpegPath" >> $env:GITHUB_ENV
+          echo "PKG_CONFIG_PATH=$ffmpegPath\..\lib\pkgconfig" >> $env:GITHUB_ENV
+          echo "PATH=$ffmpegPath;$env:PATH" >> $env:GITHUB_ENV
+      
       - name: Install LLVM and pkg-config
         run: |
           choco install llvm pkgconfiglite -y
