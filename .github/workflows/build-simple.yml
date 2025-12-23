@@ -70,17 +70,18 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
       
-      - name: Download and setup FFmpeg
-        shell: powershell
-        run: |
-          Invoke-WebRequest -Uri "https://github.com/GyanD/codexffmpeg/releases/download/6.1/ffmpeg-6.1-full_build-shared.7z" -OutFile "ffmpeg.7z"
-          7z x ffmpeg.7z -o"C:\ffmpeg"
-          echo "FFMPEG_DIR=C:\ffmpeg\ffmpeg-6.1-full_build-shared" >> $env:GITHUB_ENV
-          echo "PKG_CONFIG_PATH=C:\ffmpeg\ffmpeg-6.1-full_build-shared\lib\pkgconfig" >> $env:GITHUB_ENV
-          echo "C:\ffmpeg\ffmpeg-6.1-full_build-shared\bin" >> $env:GITHUB_PATH
+      - name: Setup FFmpeg
+        uses: FedericoCarboni/setup-ffmpeg@v3
+        with:
+          ffmpeg-version: '6.1'
+          architecture: 'x64'
+          linking-type: 'shared'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Install LLVM
-        run: choco install llvm -y
+      - name: Install LLVM and pkg-config
+        run: |
+          choco install llvm pkgconfiglite -y
+          echo "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       
       - name: Create env file
         shell: bash
@@ -96,6 +97,7 @@ jobs:
         env:
           TAURI_PRIVATE_KEY: ""
           TAURI_KEY_PASSWORD: ""
+          LIBCLANG_PATH: "C:\\Program Files\\LLVM\\bin"
       
       - name: Upload EXE
         uses: actions/upload-artifact@v4
