@@ -69,6 +69,7 @@ jobs:
         run: choco install ffmpeg llvm -y
       
       - name: Create env file
+        shell: bash
         run: |
           echo "NEXT_PUBLIC_URL=http://localhost:3000" > .env
           echo "DATABASE_URL=file:./local.db" >> .env
