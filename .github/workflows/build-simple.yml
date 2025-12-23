@@ -70,6 +70,9 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
       
+      - name: Install build dependencies
+        run: choco install pkgconfiglite -y
+      
       - name: Install FFmpeg
         run: choco install ffmpeg llvm -y
       
