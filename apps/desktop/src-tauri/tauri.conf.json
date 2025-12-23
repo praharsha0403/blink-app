@@ -70,9 +70,7 @@
 					"y": 140
 				}
 			},
-			"frameworks": [
-				"../../../target/native-deps/Spacedrive.framework"
-			]
+			"frameworks": []
 		},
 		"windows": {
 			"nsis": {
