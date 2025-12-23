@@ -40,6 +40,11 @@ jobs:
         env:
           TAURI_PRIVATE_KEY: ""
           TAURI_KEY_PASSWORD: ""
+          BINDGEN_EXTRA_CLANG_ARGS: "-I/opt/homebrew/opt/ffmpeg@6/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
+          PKG_CONFIG_PATH: "/opt/homebrew/lib/pkgconfig:/opt/homebrew/opt/ffmpeg@6/lib/pkgconfig"
+          LIBCLANG_PATH: "/opt/homebrew/opt/llvm/lib"
+          CFLAGS: "-I/opt/homebrew/opt/ffmpeg@6/include"
+          LDFLAGS: "-L/opt/homebrew/opt/ffmpeg@6/lib"
       
       - name: Upload DMG
         uses: actions/upload-artifact@v4
