@@ -70,11 +70,13 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
       
-      - name: Install build dependencies
-        run: choco install pkgconfiglite -y
+      - name: Install FFmpeg with vcpkg
+        run: |
+          vcpkg install ffmpeg:x64-windows
+          vcpkg integrate install
       
-      - name: Install FFmpeg
-        run: choco install ffmpeg llvm -y
+      - name: Install LLVM
+        run: choco install llvm -y
       
       - name: Create env file
         shell: bash
@@ -90,8 +92,9 @@ jobs:
         env:
           TAURI_PRIVATE_KEY: ""
           TAURI_KEY_PASSWORD: ""
-          PKG_CONFIG_PATH: "C:/ProgramData/chocolatey/lib/ffmpeg/tools/ffmpeg/lib/pkgconfig"
-          FFMPEG_DIR: "C:/ProgramData/chocolatey/lib/ffmpeg/tools/ffmpeg"
+          VCPKG_ROOT: "C:/vcpkg"
+          PKG_CONFIG_PATH: "C:/vcpkg/installed/x64-windows/lib/pkgconfig"
+          FFMPEG_DIR: "C:/vcpkg/installed/x64-windows"
       
       - name: Upload EXE
         uses: actions/upload-artifact@v4
