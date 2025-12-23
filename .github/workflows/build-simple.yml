@@ -97,14 +97,15 @@ jobs:
           echo "DATABASE_URL=file:./local.db" >> .env
       
       - name: Install dependencies
+        shell: msys2 {0}
         run: pnpm install --no-frozen-lockfile
       
       - name: Build app
-        run: cd apps/desktop && pnpm build:tauri -- --target x86_64-pc-windows-gnu
+        shell: msys2 {0}
+        run: cd apps/desktop && pnpm build:tauri
         env:
           TAURI_PRIVATE_KEY: ""
           TAURI_KEY_PASSWORD: ""
-          VCPKG_ROOT: ""
       
       - name: Upload EXE
         uses: actions/upload-artifact@v4
