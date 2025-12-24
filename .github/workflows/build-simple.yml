@@ -74,21 +74,20 @@ jobs:
         with:
           node-version: '20'
       
-      - name: Install pnpm
-        run: npm install -g pnpm@8
-      
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           target: x86_64-pc-windows-gnu
       
-      - name: Setup environment
+      - name: Setup environment and install pnpm
         shell: msys2 {0}
         run: |
+          npm install -g pnpm@8
           echo "PKG_CONFIG_PATH=/mingw64/lib/pkgconfig" >> $GITHUB_ENV
           echo "LIBCLANG_PATH=/mingw64/bin" >> $GITHUB_ENV
           echo "BINDGEN_EXTRA_CLANG_ARGS=-I$(pwd)/.build-support/include" >> $GITHUB_ENV
           echo "/mingw64/bin" >> $GITHUB_PATH
+          echo "/c/hostedtoolcache/windows/node/20*/x64" >> $GITHUB_PATH
       
       - name: Create env file
         shell: bash
