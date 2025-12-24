@@ -18,13 +18,15 @@ jobs:
           node-version: '20'
 
       - name: Enable pnpm
+        shell: bash
         run: |
           corepack enable
           corepack prepare pnpm@latest --activate
 
       - name: Install dependencies
+        shell: bash
         run: |
-          if [ ! -f .env ]; then type nul > .env; fi
+          if [ ! -f .env ]; then : > .env; fi
           pnpm install --frozen-lockfile
 
       - name: Setup Rust
