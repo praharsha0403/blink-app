@@ -1,0 +1,49 @@
+name: Build Windows EXE
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+
+      - name: Install dependencies
+        run: |
+          if [ ! -f .env ]; then type nul > .env; fi
+          pnpm install --frozen-lockfile
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt
+          targets: x86_64-pc-windows-msvc
+
+      - name: Build frontend (turbo)
+        run: pnpm turbo build --filter @blink/desktop
+
+      - name: Build Tauri (Windows)
+        run: pnpm run build:tauri
+
+      - name: Upload bundle artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: blink-windows-bundles
+          path: |
+            apps/desktop/src-tauri/target/release/bundle/**
+            apps/desktop/target/release/bundle/**
